@@ -27,7 +27,7 @@ for that to work.
     _, addresses = parser.parse_args()
 
     if not addresses:
-        print parser.format_help()
+        print (parser.format_help())
         parser.exit()
 
     def parse_address(addr):
@@ -49,11 +49,11 @@ def get_poetry(sockets):
     """Download poety from all the given sockets."""
 
     poems = dict.fromkeys(sockets, '') # socket -> accumulated poem
-
+    
     # socket -> task numbers
     sock2task = dict([(s, i + 1) for i, s in enumerate(sockets)])
 
-    sockets = list(sockets) # make a copy
+    sockets = sockets[:] #P3 # make a copy
 
     # we go around this loop until we've gotten all the poetry
     # from all the sockets. This is the 'reactor loop'.
@@ -64,14 +64,15 @@ def get_poetry(sockets):
         rlist, _, _ = select.select(sockets, [], [])
 
         # rlist is the list of sockets with data ready to read
+        print(rlist)
 
         for sock in rlist:
             data = ''
-
+            
             while True:
                 try:
                     new_data = sock.recv(1024)
-                except socket.error, e:
+                except socket.error as e: #P3
                     if e.args[0] == errno.EWOULDBLOCK:
                         # this error code means we would have
                         # blocked if the socket was blocking.
@@ -82,22 +83,22 @@ def get_poetry(sockets):
                     if not new_data:
                         break
                     else:
-                        data += new_data
+                        data = data + new_data.decode() #P3 bad
 
             # Each execution of this inner loop corresponds to
             # working on one asynchronous task in Figure 3 here:
             # http://krondo.com/?p=1209#figure3
 
             task_num = sock2task[sock]
-
+            
             if not data:
                 sockets.remove(sock)
                 sock.close()
-                print 'Task %d finished' % task_num
+                print ('Task %d finished' % task_num)
             else:
                 addr_fmt = format_address(sock.getpeername())
                 msg = 'Task %d: got %d bytes of poetry from %s'
-                print  msg % (task_num, len(data), addr_fmt)
+                print  (msg % (task_num, len(data), addr_fmt))
 
             poems[sock] += data
 
@@ -119,20 +120,20 @@ def format_address(address):
 
 
 def main():
-    addresses = parse_args()
+    addresses = list(parse_args())
 
     start = datetime.datetime.now()
 
     sockets = map(connect, addresses)
 
-    poems = get_poetry(sockets)
+    poems = get_poetry(list(sockets)) #P3
 
     elapsed = datetime.datetime.now() - start
 
     for i, sock in enumerate(sockets):
-        print 'Task %d: %d bytes of poetry' % (i + 1, len(poems[sock]))
+        print ('Task %d: %d bytes of poetry' % (i + 1, len(poems[sock])))
 
-    print 'Got %d poems in %s' % (len(addresses), elapsed)
+    print ('Got %d poems in %s' % (len(addresses), elapsed))
 
 
 if __name__ == '__main__':
