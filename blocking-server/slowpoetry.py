@@ -59,10 +59,10 @@ def send_poetry(sock, poetry_file, num_bytes, delay):
             inputf.close()
             return
 
-        print 'Sending %d bytes' % len(bytes)
+        print ('Sending %d bytes' % len(bytes)) #P3
 
         try:
-            sock.sendall(bytes) # this is a blocking call
+            sock.sendall(bytes.encode()) #P3 added endode() # this is a blocking call
         except socket.error:
             sock.close()
             inputf.close()
@@ -75,7 +75,7 @@ def serve(listen_socket, poetry_file, num_bytes, delay):
     while True:
         sock, addr = listen_socket.accept()
 
-        print 'Somebody at %s wants poetry!' % (addr,)
+        print ('Somebody at %s wants poetry!' % (addr,)) #P3
 
         send_poetry(sock, poetry_file, num_bytes, delay)
 
@@ -89,7 +89,7 @@ def main():
 
     sock.listen(5)
 
-    print 'Serving %s on port %s.' % (poetry_file, sock.getsockname()[1])
+    print ('Serving %s on port %s.' % (poetry_file, sock.getsockname()[1])) #P3
 
     serve(sock, poetry_file, options.num_bytes, options.delay)
 
