@@ -27,7 +27,7 @@ for that to work.
     _, addresses = parser.parse_args()
 
     if not addresses:
-        print parser.format_help()
+        print( parser.format_help() )
         parser.exit()
 
     def parse_address(addr):
@@ -51,7 +51,7 @@ def get_poetry(address):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect(address)
 
-    poem = ''
+    poem = []
 
     while True:
 
@@ -65,9 +65,9 @@ def get_poetry(address):
             sock.close()
             break
 
-        poem += data
+        poem.append(data.decode())
 
-    return poem
+    return ''.join(poem)
 
 
 def format_address(address):
@@ -76,14 +76,14 @@ def format_address(address):
 
 
 def main():
-    addresses = parse_args()
+    addresses = list(parse_args()) #P3
 
     elapsed = datetime.timedelta()
 
     for i, address in enumerate(addresses):
         addr_fmt = format_address(address)
 
-        print 'Task %d: get poetry from: %s' % (i + 1, addr_fmt)
+        print( 'Task %d: get poetry from: %s' % (i + 1, addr_fmt) )
 
         start = datetime.datetime.now()
 
@@ -96,11 +96,11 @@ def main():
         time = datetime.datetime.now() - start
 
         msg = 'Task %d: got %d bytes of poetry from %s in %s'
-        print  msg % (i + 1, len(poem), addr_fmt, time)
+        print(  msg % (i + 1, len(poem), addr_fmt, time) )
 
         elapsed += time
 
-    print 'Got %d poems in %s' % (len(addresses), elapsed)
+    print( 'Got %d poems in %s' % (len(addresses), elapsed) )
 
 
 if __name__ == '__main__':
