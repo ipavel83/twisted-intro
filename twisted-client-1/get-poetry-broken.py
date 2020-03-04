@@ -35,7 +35,7 @@ for that to work.
     _, addresses = parser.parse_args()
 
     if not addresses:
-        print parser.format_help()
+        print( parser.format_help() )
         parser.exit()
 
     def parse_address(addr):
@@ -89,16 +89,17 @@ class PoetrySocket(object):
         reactor.stop() # no more poetry
 
     def doRead(self):
-        poem = ''
+        poem = []
 
         while True: # we're just reading everything (blocking) -- broken!
             bytes = self.sock.recv(1024)
             if not bytes:
                 break
-            poem += bytes
+            poem.append( bytes.decode() )
 
         msg = 'Task %d: got %d bytes of poetry from %s'
-        print  msg % (self.task_num, len(poem), self.format_addr())
+        poem = ''.join( poem )
+        print(  msg % (self.task_num, len(poem), self.format_addr()))
 
         self.poem = poem
 
@@ -113,7 +114,7 @@ class PoetrySocket(object):
 
 
 def poetry_main():
-    addresses = parse_args()
+    addresses = list(parse_args())
 
     start = datetime.datetime.now()
 
@@ -125,9 +126,9 @@ def poetry_main():
     elapsed = datetime.datetime.now() - start
 
     for i, sock in enumerate(sockets):
-        print 'Task %d: %d bytes of poetry' % (i + 1, len(sock.poem))
+        print( 'Task %d: %d bytes of poetry' % (i + 1, len(sock.poem)))
 
-    print 'Got %d poems in %s' % (len(addresses), elapsed)
+    print( 'Got %d poems in %s' % (len(addresses), elapsed) )
 
 
 if __name__ == '__main__':
