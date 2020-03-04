@@ -32,7 +32,7 @@ for that to work.
     _, addresses = parser.parse_args()
 
     if not addresses:
-        print parser.format_help()
+        print( parser.format_help() )
         parser.exit()
 
     def parse_address(addr):
@@ -86,7 +86,7 @@ class PoetrySocket(object):
         reactor.stop() # no more poetry
 
     def doRead(self):
-        bytes = ''
+        bytes = []
 
         while True:
             try:
@@ -94,20 +94,21 @@ class PoetrySocket(object):
                 if not bytesread:
                     break
                 else:
-                    bytes += bytesread
-            except socket.error, e:
+                    bytes.append( bytesread.decode() )
+            except socket.error as e:
                 if e.args[0] == errno.EWOULDBLOCK:
                     break
                 return main.CONNECTION_LOST
 
         if not bytes:
-            print 'Task %d finished' % self.task_num
+            print( 'Task %d finished' % self.task_num )
             return main.CONNECTION_DONE
-        else:
-            msg = 'Task %d: got %d bytes of poetry from %s'
-            print  msg % (self.task_num, len(bytes), self.format_addr())
+        
+        msg = 'Task %d: got %d bytes of poetry from %s'
+        bytes = ''.join(bytes)
+        print( msg % (self.task_num, len(bytes), self.format_addr()) )
 
-        self.poem += bytes
+        self.poem = self.poem + bytes
 
     def logPrefix(self):
         return 'poetry'
@@ -118,7 +119,7 @@ class PoetrySocket(object):
 
 
 def poetry_main():
-    addresses = parse_args()
+    addresses = list(parse_args())
 
     start = datetime.datetime.now()
 
@@ -130,9 +131,9 @@ def poetry_main():
     elapsed = datetime.datetime.now() - start
 
     for i, sock in enumerate(sockets):
-        print 'Task %d: %d bytes of poetry' % (i + 1, len(sock.poem))
+        print( 'Task %d: %d bytes of poetry' % (i + 1, len(sock.poem)) )
 
-    print 'Got %d poems in %s' % (len(addresses), elapsed)
+    print( 'Got %d poems in %s' % (len(addresses), elapsed) )
 
 
 if __name__ == '__main__':
