@@ -100,7 +100,7 @@ def get_poetry(sockets):
                 msg = 'Task %d: got %d bytes of poetry from %s'
                 print  (msg % (task_num, len(data), addr_fmt))
 
-            poems[sock] += data
+            poems[sock] = poems[sock] + data
 
     return poems
 
@@ -124,9 +124,9 @@ def main():
 
     start = datetime.datetime.now()
 
-    sockets = map(connect, addresses)
+    sockets = list(map(connect, addresses)) #P3
 
-    poems = get_poetry(list(sockets)) #P3
+    poems = get_poetry(sockets) #P3
 
     elapsed = datetime.datetime.now() - start
 
