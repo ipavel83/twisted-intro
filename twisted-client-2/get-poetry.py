@@ -51,11 +51,13 @@ for that to work.
 
 class PoetryProtocol(Protocol):
 
-    poem = ''
     task_num = 0
+    
+    def __init__(self):
+        self.poem = []
 
     def dataReceived(self, data):
-        self.poem = self.poem + data.decode()
+        self.poem.append( data.decode() )
         msg = 'Task %d: got %d bytes of poetry from %s'
         print( msg % (self.task_num, len(data), self.transport.getPeer()) )
 
@@ -63,7 +65,7 @@ class PoetryProtocol(Protocol):
         self.poemReceived(self.poem)
 
     def poemReceived(self, poem):
-        self.factory.poem_finished(self.task_num, poem)
+        self.factory.poem_finished(self.task_num, ''.join(poem))
 
 
 class PoetryClientFactory(ClientFactory):
