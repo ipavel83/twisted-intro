@@ -29,7 +29,7 @@ gets the first bits of a poem.
     _, addresses = parser.parse_args()
 
     if not addresses:
-        print parser.format_help()
+        print( parser.format_help() )
         parser.exit()
 
     def parse_address(addr):
@@ -92,15 +92,15 @@ class PoetryClientFactory(ClientFactory):
 
     def report(self):
         for i in self.poems:
-            print 'Task %d: %d bytes of poetry' % (i, len(self.poems[i]))
+            print( 'Task %d: %d bytes of poetry' % (i, len(self.poems[i])) )
 
     def clientConnectionFailed(self, connector, reason):
-        print 'Failed to connect to:', connector.getDestination()
+        print( 'Failed to connect to:', connector.getDestination() )
         self.poem_finished()
 
 
 def poetry_main():
-    addresses = parse_args()
+    addresses = list(parse_args())
 
     start = datetime.datetime.now()
 
@@ -116,7 +116,7 @@ def poetry_main():
 
     elapsed = datetime.datetime.now() - start
 
-    print 'Got %d poems in %s' % (len(addresses), elapsed)
+    print( 'Got %d poems in %s' % (len(addresses), elapsed) )
 
 
 if __name__ == '__main__':

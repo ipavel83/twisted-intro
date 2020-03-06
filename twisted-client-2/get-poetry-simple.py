@@ -31,7 +31,7 @@ for that to work.
     _, addresses = parser.parse_args()
 
     if not addresses:
-        print parser.format_help()
+        print( parser.format_help() )
         parser.exit()
 
     def parse_address(addr):
@@ -51,16 +51,17 @@ for that to work.
 
 class PoetryProtocol(Protocol):
 
-    poem = ''
+    def __init__(self):
+        self.poem = []
 
     def dataReceived(self, data):
-        self.poem += data
+        self.poem.append( data.decode() )
 
     def connectionLost(self, reason):
         self.poemReceived(self.poem)
 
     def poemReceived(self, poem):
-        self.factory.poem_finished(poem)
+        self.factory.poem_finished( ''.join(poem))
 
 
 class PoetryClientFactory(ClientFactory):
@@ -84,15 +85,15 @@ class PoetryClientFactory(ClientFactory):
 
     def report(self):
         for poem in self.poems:
-            print poem
+            print( poem)
 
     def clientConnectionFailed(self, connector, reason):
-        print 'Failed to connect to:', connector.getDestination()
+        print( 'Failed to connect to:', connector.getDestination())
         self.poem_finished()
 
 
 def poetry_main():
-    addresses = parse_args()
+    addresses = list(parse_args())
 
     factory = PoetryClientFactory(len(addresses))
 
