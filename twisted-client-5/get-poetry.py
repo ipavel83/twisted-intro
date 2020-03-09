@@ -30,7 +30,7 @@ for that to work.
     _, addresses = parser.parse_args()
 
     if not addresses:
-        print parser.format_help()
+        print( parser.format_help() )
         parser.exit()
 
     def parse_address(addr):
@@ -50,16 +50,17 @@ for that to work.
 
 class PoetryProtocol(Protocol):
 
-    poem = ''
+    def __init__(self):
+        self.poem = []
 
     def dataReceived(self, data):
-        self.poem += data
+        self.poem.append( data.decode() )
 
     def connectionLost(self, reason):
         self.poemReceived(self.poem)
 
     def poemReceived(self, poem):
-        self.factory.poem_finished(poem)
+        self.factory.poem_finished( ''.join(poem))
 
 
 class PoetryClientFactory(ClientFactory):
@@ -117,7 +118,7 @@ def cummingsify(poem):
 
 
 def poetry_main():
-    addresses = parse_args()
+    addresses = list(parse_args())
 
     from twisted.internet import reactor
 
@@ -130,15 +131,15 @@ def poetry_main():
         except GibberishError:
             raise
         except:
-            print 'Cummingsify failed!'
+            print( 'Cummingsify failed!' )
             return poem
 
     def got_poem(poem):
-        print poem
+        print( poem )
         poems.append(poem)
 
     def poem_failed(err):
-        print >>sys.stderr, 'The poem download failed.'
+        print( 'The poem download failed.', file=sys.stderr )
         errors.append(err)
 
     def poem_done(_):
