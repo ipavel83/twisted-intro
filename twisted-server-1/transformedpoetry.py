@@ -47,6 +47,7 @@ class TransformService(object):
 class TransformProtocol(NetstringReceiver):
 
     def stringReceived(self, request):
+        request = request.decode()
         if '.' not in request: # bad request
             self.transport.loseConnection()
             return
@@ -59,7 +60,7 @@ class TransformProtocol(NetstringReceiver):
         new_poem = self.factory.transform(xform_name, poem)
 
         if new_poem is not None:
-            self.sendString(new_poem)
+            self.sendString(new_poem.encode())
 
         self.transport.loseConnection()
 
@@ -98,7 +99,7 @@ def main():
     port = reactor.listenTCP(options.port or 0, factory,
                              interface=options.iface)
 
-    print 'Serving transforms on %s.' % (port.getHost(),)
+    print( 'Serving transforms on %s.' % (port.getHost(),) )
 
     reactor.run()
 
