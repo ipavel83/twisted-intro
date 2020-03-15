@@ -10,7 +10,7 @@ from twisted.trial.unittest import TestCase
 class PoetryServerProtocol(Protocol):
 
     def connectionMade(self):
-        self.transport.write(self.factory.poem)
+        self.transport.write(self.factory.poem.encode())
         self.transport.loseConnection()
 
 class PoetryServerFactory(ServerFactory):
@@ -23,16 +23,16 @@ class PoetryServerFactory(ServerFactory):
 
 class PoetryClientProtocol(Protocol):
 
-    poem = ''
+    poem = b''
 
     def dataReceived(self, data):
-        self.poem += data
+        self.poem = self.poem + data
 
     def connectionLost(self, reason):
         self.poemReceived(self.poem)
 
     def poemReceived(self, poem):
-        self.factory.poem_finished(poem)
+        self.factory.poem_finished(poem.decode())
 
 
 class PoetryClientFactory(ClientFactory):
@@ -72,6 +72,7 @@ class PoetryTestCase(TestCase):
         from twisted.internet import reactor
         self.port = reactor.listenTCP(0, factory, interface="127.0.0.1")
         self.portnum = self.port.getHost().port
+        self.timeout = 10
 
     def tearDown(self):
         port, self.port = self.port, None
