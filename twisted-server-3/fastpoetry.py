@@ -12,7 +12,7 @@ class PoetryProtocol(Protocol):
         poem = self.factory.service.poem
         log.msg('sending %d bytes of poetry to %s'
                 % (len(poem), self.transport.getPeer()))
-        self.transport.write(poem)
+        self.transport.write(poem.encode())
         self.transport.loseConnection()
 
 
